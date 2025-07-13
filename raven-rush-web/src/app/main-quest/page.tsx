@@ -34,7 +34,7 @@ export default function QuestPage() {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="text-lg md:text-xl text-gray-300 max-w-xl mb-8"
         >
-          We're almost ready to launch the Raven Rush main quest. Gear up, rally your guild, and prepare for a PvP racing showdown like no other.
+          We are almost ready to launch the Raven Rush main quest. Gear up, rally your guild, and prepare for a PvP racing showdown like no other.
         </motion.p>
 
         <motion.div

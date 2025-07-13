@@ -37,7 +37,7 @@ const sections = [
   {
     title: "Join our Community",
     description:
-      "Raven Rush isn’t just a game, it’s a community of racers, creators, and Web3 fans. 🏁\n\nJoin us on Discord to share race clips, win giveaways, and vote on game features. Weekly events, contests, and exclusive drops keep the hype alive. \n\nWhether you're here to compete, create, or just vibe, there's a place for you in the rush. 🚀",
+      "Raven Rush is not just a game, it is a community of racers, creators, and Web3 fans. 🏁\n\nJoin us on Discord to share race clips, win giveaways, and vote on game features. Weekly events, contests, and exclusive drops keep the hype alive. \n\nWhether you are here to compete, create, or just vibe, there is a place for you in the rush. 🚀",
     image: "https://i.postimg.cc/1zq0hYZX/65601744-ff2a-4cd5-868e-4d0d1e88c482.png",
   },
 ];

@@ -3,6 +3,7 @@
 import "./globals.css";
 import { ReactNode } from "react";
 import { Inter } from "next/font/google";
+import Providers from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,9 +17,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <head />
       <body className={`${inter.className} bg-black text-white min-h-screen antialiased`}>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
 }
-

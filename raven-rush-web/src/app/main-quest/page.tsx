@@ -178,36 +178,52 @@ export default function QuestPage() {
               </button>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-6 justify-between items-center w-full max-w-5xl">
-              <div className="text-center bg-black/60 border border-purple-800 px-6 py-4 rounded-lg shadow-md">
-                <p className="text-sm text-purple-300">⭐ Total Points</p>
-                <p className="text-2xl font-bold">{points}</p>
-                {rank !== null && <p className="text-sm font-semibold text-yellow-300 mt-1">🎖️ Rank: #{rank}</p>}
-              </div>
-              <div className="flex flex-col items-center">
-                <button
-                  onClick={() => handleTransaction("checkin")}
-                  disabled={loading || !!cooldown}
-                  className={`w-40 py-3 rounded-md font-semibold transition ${cooldown ? "bg-blue-600 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700"}`}
-                >
-                  🧭 Check-in
-                </button>
-                {cooldown && (
-                  <p className="mt-2 text-xl font-bold text-yellow-300 animate-pulse">
-                    ⏱ Next check-in: {formatTime(cooldown)}
-                  </p>
-                )}
-              </div>
-              <div className="flex flex-col items-center">
-                <button
-                  onClick={() => handleTransaction("boost")}
-                  disabled={loading}
-                  className="w-40 py-3 rounded-md font-semibold bg-yellow-500 hover:bg-yellow-600 text-black transition shadow"
-                >
-                  ⚡ Boost ({boostCount})
-                </button>
-              </div>
-            </div>
+               <div className="flex flex-col md:flex-row gap-6 justify-between items-center w-full max-w-5xl">
+  <div className="text-center bg-black/60 border border-purple-800 px-6 py-4 rounded-lg shadow-md">
+    <p className="text-sm text-purple-300">⭐ Total Points</p>
+    <p className="text-2xl font-bold">{points}</p>
+    {rank !== null && (
+      <p className="text-sm font-semibold text-yellow-300 mt-1">
+        🎖️ Rank: #{rank}
+      </p>
+    )}
+  </div>
+
+  <div className="flex flex-col items-center">
+    <button
+      onClick={() => handleTransaction("checkin")}
+      disabled={loading || !!cooldown}
+      className={`w-40 py-3 rounded-md font-semibold transition ${
+        cooldown
+          ? "bg-blue-600 cursor-not-allowed"
+          : "bg-purple-600 hover:bg-purple-700"
+      }`}
+    >
+      🧭 Check-in
+    </button>
+    {cooldown && (
+      <p className="mt-2 text-xl font-bold text-yellow-300 animate-pulse">
+        ⏱ Next check-in: {formatTime(cooldown)}
+      </p>
+    )}
+  </div>
+
+  <div className="flex flex-col items-center">
+    <button
+      onClick={() => handleTransaction("boost")}
+      disabled={loading}
+      className="w-40 py-3 rounded-md font-semibold bg-yellow-500 hover:bg-yellow-600 text-black transition shadow"
+    >
+      ⚡ Boost ({boostCount})
+    </button>
+  </div>
+</div>
+
+{message && (
+  <div className="mt-4 text-center text-sm font-semibold text-yellow-300 animate-pulse">
+    {message}
+  </div>
+)}
 
             <AnimatePresence>
               {showProfile && (

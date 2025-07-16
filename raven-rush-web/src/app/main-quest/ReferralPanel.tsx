@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import { motion } from "framer-motion";
-
+// ❌ removed: import { motion } from "framer-motion";
 // Types
 type RefData = {
   address: string;

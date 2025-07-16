@@ -30,17 +30,15 @@ export async function GET() {
 
   // Clone before sort to avoid mutating file data
   const sorted = [...users].sort((a, b) => b.points - a.points);
-
   const filtered = sorted.filter((u) => u.points > 0);
 
-const leaderboard = filtered.map((u, i) => ({
-  address: u.address,
-  points: u.points,
-  boosts: u.boosts || 0,
-  lastCheckIn: u.lastCheckIn || null,
-  rank: i + 1,
-}));
-
+  const leaderboard = filtered.map((u, i) => ({
+    address: u.address,
+    points: u.points,
+    boosts: u.boosts || 0,
+    lastCheckIn: u.lastCheckIn || null,
+    rank: i + 1,
+  }));
 
   return NextResponse.json(leaderboard);
 }
@@ -60,7 +58,7 @@ export async function POST(req: Request) {
 
   const normalized = address.toLowerCase();
 
-  let users = readUserData();
+  const users = readUserData(); // ✅ Fixed from let → const
   let userIndex = users.findIndex((u) => u.address.toLowerCase() === normalized);
   let user = userIndex !== -1 ? users[userIndex] : null;
 
@@ -101,17 +99,16 @@ export async function POST(req: Request) {
   users[userIndex] = user;
   writeUserData(users);
 
-  // Also return the fresh sorted leaderboard so frontend can update everything at once
+  // Return leaderboard
   const sorted = [...users].sort((a, b) => b.points - a.points);
-const filtered = sorted.filter((u) => u.points > 0);
-
-const leaderboard = filtered.map((u, i) => ({
-  address: u.address,
-  points: u.points,
-  boosts: u.boosts || 0,
-  lastCheckIn: u.lastCheckIn || null,
-  rank: i + 1,
-}));
+  const filtered = sorted.filter((u) => u.points > 0);
+  const leaderboard = filtered.map((u, i) => ({
+    address: u.address,
+    points: u.points,
+    boosts: u.boosts || 0,
+    lastCheckIn: u.lastCheckIn || null,
+    rank: i + 1,
+  }));
 
   return NextResponse.json({ success: true, user, leaderboard });
 }

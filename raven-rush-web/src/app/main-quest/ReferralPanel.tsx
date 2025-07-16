@@ -45,13 +45,13 @@ export default function ReferralPanel() {
       setError("Unable to load referral leaderboard");
     });
 
-  // Get user's own referral info
+  // Get users own referral info
   fetch(`/api/user/referral?address=${address}`)
     .then((res) => res.json())
     .then((data) => {
       if (data?.refCode) {
         setUserRef(data);
-        setSubmitted(true); // 👈 Make sure the form doesn't reappear
+        setSubmitted(true); // 👈 Make sure the form does not reappear
       }
     })
     .catch((err) => {
@@ -146,7 +146,7 @@ export default function ReferralPanel() {
             </button>
           </div>
           <p className="text-gray-400 text-xs">
-            Share your referral code. You'll earn 1 invite point per user.
+            Share your referral code. You will earn 1 invite point per user.
           </p>
         </div>
       )}

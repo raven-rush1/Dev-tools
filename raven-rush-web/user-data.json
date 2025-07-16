@@ -84,5 +84,12 @@
     "boosts": 10,
     "lastCheckIn": null,
     "lastBoost": null
+  },
+  {
+    "address": "0xe22cc6c1f94f5df9ae3d7e81737ff441800e1380",
+    "points": 0,
+    "boosts": 0,
+    "lastCheckIn": null,
+    "lastBoost": null
   }
 ]

@@ -219,7 +219,7 @@ export default function QuestPage() {
                   className="fixed right-0 top-0 h-full w-full max-w-sm bg-[#0a001a] border-l border-purple-800 p-6 z-50 shadow-lg overflow-y-auto"
                 >
                   <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-bold text-purple-400">User Profile</h2>
+                    <h2 className="text-lg font-bold text-purple-400">My Profile</h2>
                     <button onClick={() => setShowProfile(false)} className="text-red-400 hover:underline">Close</button>
                   </div>
                   <div className="space-y-4 text-sm">

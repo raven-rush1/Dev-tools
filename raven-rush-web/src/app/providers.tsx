@@ -1,11 +1,8 @@
-// src/app/providers.tsx
-
 "use client";
 
 import { ReactNode } from "react";
 import {
   WagmiProvider,
-  createConfig,
   http,
 } from "wagmi";
 import {
@@ -41,6 +38,7 @@ const config = getDefaultConfig({
     [sepolia.id]: http(),
   },
 });
+
 const queryClient = new QueryClient();
 
 export default function Providers({ children }: { children: ReactNode }) {

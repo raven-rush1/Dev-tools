@@ -1,6 +1,5 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAccount, useDisconnect, useChainId } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -8,7 +7,6 @@ import { ethers } from "ethers";
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
 import ReferralPanel from "./ReferralPanel";
-
 
 const CONTRACT_ADDRESS = "0xA597a1Dc00E722627bA796dCFF1130d33A35a1Eb";
 const CONTRACT_ABI = [
@@ -78,73 +76,72 @@ export default function QuestPage() {
   }, [lastCheckIn]);
 
   async function handleTransaction(type: "checkin" | "boost") {
-  try {
-    if (!window.ethereum) throw new Error("Wallet not detected");
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const signer = await provider.getSigner();
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-    const value = type === "checkin" ? ethers.parseEther("0.00003") : ethers.parseEther("0.002");
+    try {
+      if (!window.ethereum) throw new Error("Wallet not detected");
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+      const value = type === "checkin" ? ethers.parseEther("0.00003") : ethers.parseEther("0.002");
 
-    setLoading(true);
-    setMessage(type === "checkin" ? "Checking in..." : "Boosting...");
-    const tx = await contract[type === "checkin" ? "checkIn" : "boost"]({ value });
-    await tx.wait();
+      setLoading(true);
+      setMessage(type === "checkin" ? "Checking in..." : "Boosting...");
+      const tx = await contract[type === "checkin" ? "checkIn" : "boost"]({ value });
+      await tx.wait();
 
-    setRecentTxs((prev) => [tx.hash, ...prev.slice(0, 4)]);
+      setRecentTxs((prev) => [tx.hash, ...prev.slice(0, 4)]);
 
-    // Tell backend and get fresh leaderboard back
-    const res = await fetch('/api/user', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ address, action: type })
-    });
-    const data = await res.json();
+      const res = await fetch('/api/user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address, action: type })
+      });
+      const data = await res.json();
 
-    if (data && data.leaderboard) {
-      setLeaderboard(data.leaderboard);
-      const current = data.leaderboard.find((u:LeaderboardUser) => u.address === address?.toLowerCase());
-      if (current) {
-        setPoints(current.points);
-        setRank(current.rank);
-        setBoostCount(current.boosts || 0);
-        if (current.lastCheckIn) setLastCheckIn(current.lastCheckIn);
+      if (data && data.leaderboard) {
+        setLeaderboard(data.leaderboard);
+        const current = data.leaderboard.find((u: LeaderboardUser) => u.address === address?.toLowerCase());
+        if (current) {
+          setPoints(current.points);
+          setRank(current.rank);
+          setBoostCount(current.boosts || 0);
+          if (current.lastCheckIn) setLastCheckIn(current.lastCheckIn);
+        }
       }
+
+      setMessage(type === "checkin" ? "✅ Check-in successful!" : "⚡ Boost successful!");
+    } catch (err) {
+      console.error(err);
+      setMessage("❌ Transaction failed.");
+    } finally {
+      setLoading(false);
+      setTimeout(() => setMessage(""), 3000);
     }
-
-    setMessage(type === "checkin" ? "✅ Check-in successful!" : "⚡ Boost successful!");
-  } catch (err) {
-    console.error(err);
-    setMessage("❌ Transaction failed.");
-  } finally {
-    setLoading(false);
-    setTimeout(() => setMessage(""), 3000);
-
   }
-}
-  async function fetchLeaderboard() {
+
+  const fetchLeaderboard = useCallback(async () => {
     const res = await fetch("/api/user");
     const data = await res.json();
     setLeaderboard(data);
     const current = data.find(
-  (u: LeaderboardUser) => u.address.toLowerCase() === address?.toLowerCase()
-);
+      (u: LeaderboardUser) => u.address.toLowerCase() === address?.toLowerCase()
+    );
     if (current) {
       setPoints(current.points);
       setRank(current.rank);
       setBoostCount(current.boosts || 0);
       if (current.lastCheckIn) setLastCheckIn(current.lastCheckIn);
     }
-  }
+  }, [address]);
 
   useEffect(() => {
-  if (isConnected && address) {
-    fetch('/api/user', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ address, action: 'ensure' }),
-    }).then(() => fetchLeaderboard());
-  }
-}, [isConnected, address]);
+    if (isConnected && address) {
+      fetch('/api/user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address, action: 'ensure' }),
+      }).then(() => fetchLeaderboard());
+    }
+  }, [isConnected, address, fetchLeaderboard]);
 
   return (
     <div
@@ -152,22 +149,11 @@ export default function QuestPage() {
       style={{ backgroundImage: 'url("https://i.postimg.cc/Y2s64bFp/Raven-1.png")' }}
     >
       <Navbar />
-
       <main className="flex-1 px-6 pt-20 flex flex-col items-center">
-        {/* Header */}
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-4xl md:text-5xl font-extrabold text-purple-500 mb-2 drop-shadow-lg"
-        >
-          Raven Rush Quest
-        </motion.h1>
-
-        {/* Empty space for your small content */}
-        <div className="max-w-2xl text-center text-sm text-purple-200 mb-6">
-          {/* <-- put your small text/banner here --> */} Complete daily check-ins, boost your points with boosters, earn rewards, and climb the leaderboard.
-        </div>
+        <h1 className="text-4xl md:text-5xl font-extrabold text-purple-500 mb-2 drop-shadow-lg">Raven Rush Quest</h1>
+        <p className="max-w-2xl text-center text-sm text-purple-200 mb-6">
+          Complete daily check-ins, boost your points with boosters, earn rewards, and climb the leaderboard.
+        </p>
 
         {isConnected ? (
           <>
@@ -192,41 +178,26 @@ export default function QuestPage() {
               </button>
             </div>
 
-            <section className="w-full max-w-5xl flex flex-col md:flex-row justify-between items-center mb-10 gap-6 px-4">
-              {/* Total points & rank */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="text-center bg-black/60 border border-purple-800 px-6 py-4 rounded-lg shadow-md"
-              >
+            <div className="flex flex-col md:flex-row gap-6 justify-between items-center w-full max-w-5xl">
+              <div className="text-center bg-black/60 border border-purple-800 px-6 py-4 rounded-lg shadow-md">
                 <p className="text-sm text-purple-300">⭐ Total Points</p>
                 <p className="text-2xl font-bold">{points}</p>
                 {rank !== null && <p className="text-sm font-semibold text-yellow-300 mt-1">🎖️ Rank: #{rank}</p>}
-              </motion.div>
-
-              {/* Check-in button & bold timer */}
+              </div>
               <div className="flex flex-col items-center">
                 <button
                   onClick={() => handleTransaction("checkin")}
                   disabled={loading || !!cooldown}
-                  className={`w-40 py-3 rounded-md font-semibold transition ${
-                    cooldown ? "bg-blue-600 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700"
-                  }`}
+                  className={`w-40 py-3 rounded-md font-semibold transition ${cooldown ? "bg-blue-600 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700"}`}
                 >
                   🧭 Check-in
                 </button>
                 {cooldown && (
-                  <div className="mt-2 text-center">
-                    <p className="text-xl font-bold text-yellow-300 animate-pulse">
-                      ⏱ Next check-in: {formatTime(cooldown)}
-                    </p>
-                    <p className="text-xs text-purple-200">Come back after 6 hours for next check-in</p>
-                  </div>
+                  <p className="mt-2 text-xl font-bold text-yellow-300 animate-pulse">
+                    ⏱ Next check-in: {formatTime(cooldown)}
+                  </p>
                 )}
               </div>
-
-              {/* Boost */}
               <div className="flex flex-col items-center">
                 <button
                   onClick={() => handleTransaction("boost")}
@@ -236,46 +207,8 @@ export default function QuestPage() {
                   ⚡ Boost ({boostCount})
                 </button>
               </div>
-            </section>
+            </div>
 
-            {message && <div className="text-center text-green-400 text-sm mb-3 animate-fadeIn">{message}</div>}
-
-            {/* Leaderboard */}
-            <aside className="w-full max-w-5xl bg-black/60 rounded-lg p-6 mt-6">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-xl font-bold text-purple-300">🏆 Leaderboard</h3>
-                <button onClick={toggleSidebar} className="text-sm text-gray-400 hover:text-white">
-                  {showSidebar ? "Hide Panel" : "Show Panel"}
-                </button>
-              </div>
-              <AnimatePresence>
-                {showSidebar && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="grid grid-cols-3 text-sm text-purple-200 font-bold border-b border-purple-800 pb-2 mb-2">
-                      <span>rank</span>
-                      <span>user</span>
-                      <span>Points</span>
-                    </div>
-                    <ul className="space-y-1 text-sm text-white">
-                      {leaderboard.map((user, i) => (
-                        <li key={i} className="grid grid-cols-3 border-b border-purple-900 py-1">
-                          <span>#{user.rank}</span>
-                          <span>{user.address.slice(0, 6)}...{user.address.slice(-4)}</span>
-                          <span>{user.points}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </aside>
-
-            {/* Profile panel */}
             <AnimatePresence>
               {showProfile && (
                 <motion.div
@@ -325,7 +258,41 @@ export default function QuestPage() {
                   </div>
                 </motion.div>
               )}
-             </AnimatePresence>
+            </AnimatePresence>
+
+            <aside className="w-full max-w-5xl bg-black/60 rounded-lg p-6 mt-6">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-xl font-bold text-purple-300">🏆 Leaderboard</h3>
+                <button onClick={toggleSidebar} className="text-sm text-gray-400 hover:text-white">
+                  {showSidebar ? "Hide Panel" : "Show Panel"}
+                </button>
+              </div>
+              <AnimatePresence>
+                {showSidebar && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="grid grid-cols-3 text-sm text-purple-200 font-bold border-b border-purple-800 pb-2 mb-2">
+                      <span>Rank</span>
+                      <span>User</span>
+                      <span>Points</span>
+                    </div>
+                    <ul className="space-y-1 text-sm text-white">
+                      {leaderboard.map((user, i) => (
+                        <li key={i} className="grid grid-cols-3 border-b border-purple-900 py-1">
+                          <span>#{user.rank}</span>
+                          <span>{user.address.slice(0, 6)}...{user.address.slice(-4)}</span>
+                          <span>{user.points}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </aside>
           </>
         ) : (
           <div className="mt-6">
@@ -333,10 +300,8 @@ export default function QuestPage() {
           </div>
         )}
 
-        {/* ✅ Referral Panel: shown only inside Main Quest page */}
         <ReferralPanel />
       </main>
-
       <Footer />
     </div>
   );

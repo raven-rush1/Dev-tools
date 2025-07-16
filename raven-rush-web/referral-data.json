@@ -1,0 +1,32 @@
+[
+  {
+    "address": "0xfc405579d02a42649541b6ddacbbdee1f9474413",
+    "refCode": "fc4055",
+    "referrer": "Raven-rush",
+    "invites": 4
+  },
+  {
+    "address": "0xef7ffb3192380c579a73e610ab8f5d1d3b0aa119",
+    "refCode": "ef7ffb",
+    "referrer": "fc4055",
+    "invites": 0
+  },
+  {
+    "address": "0xf4cbece3a02de0595322ac35d2201853c8b25858",
+    "refCode": "f4cbec",
+    "referrer": "fc4055",
+    "invites": 0
+  },
+  {
+    "address": "0xfdc80c4a609add9d36cea190dbbcf84bfa954da6",
+    "refCode": "fdc80c",
+    "referrer": "fc4055",
+    "invites": 0
+  },
+  {
+    "address": "0x5a8d3363ce173ff2fb91dc8c46a494afb653769b",
+    "refCode": "5a8d33",
+    "referrer": "fc4055",
+    "invites": 0
+  }
+]

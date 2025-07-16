@@ -94,7 +94,7 @@ export default function ReferralPanel() {
   if (!isConnected || !address) {
     return (
       <div className="mt-16 text-center text-purple-300 text-sm">
-        🔒 Connect your wallet to access the referral dashboard.
+        🔒 Connect your wallet to Access All Quests.
       </div>
     );
   }

@@ -23,6 +23,13 @@ export default function ReferralPanel() {
   const [submitted, setSubmitted] = useState(false);
   const [leaderboard, setLeaderboard] = useState<RefData[]>([]);
   const [copied, setCopied] = useState(false);
+const handleCopy = () => {
+  navigator.clipboard.writeText(generatedCode);
+  setCopied(true); // ✅ use it here
+  setTimeout(() => setCopied(false), 2000);
+}; {copied && <span className="text-green-400 text-sm">Copied!</span>}
+
+
   const [error, setError] = useState<string | null>(null);
 
  useEffect(() => {
@@ -62,6 +69,8 @@ export default function ReferralPanel() {
  const submitReferral = async () => {
   if (!inputCode || !address) return;
 
+  console.log("Submitting referral for:", address, "with code:", inputCode);
+
   try {
     const res = await fetch("/api/user/referral", {
       method: "POST",
@@ -72,21 +81,28 @@ export default function ReferralPanel() {
       }),
     });
 
+    console.log("Raw response:", res);
+
     let data;
     try {
       data = await res.json();
+      console.log("Parsed response:", data);
     } catch (err) {
+      console.error("JSON parse error:", err);
       setError("Failed to parse server response.");
       return;
     }
 
     if (res.ok && data?.user) {
+      console.log("Referral successful:", data.user);
       setUserRef(data.user);
       setSubmitted(true);
-      setError(null); // Clear previous error
+      setError(null);
     } else if (data?.error) {
+      console.warn("Referral error:", data.error);
       setError(data.error);
     } else {
+      console.warn("Unexpected error:", data);
       setError("Invalid referral code or already used.");
     }
   } catch (err) {

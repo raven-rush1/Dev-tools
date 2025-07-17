@@ -58,37 +58,43 @@ export default function ReferralPanel() {
     });
 }, [address]);
 
+ // Handle submission
+ const submitReferral = async () => {
+  if (!inputCode || !address) return;
 
-  // Handle submission
-  const submitReferral = async () => {
-    if (!inputCode || !address) return;
+  try {
+    const res = await fetch("/api/user/referral", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        address,
+        refCodeUsed: inputCode || "Raven-rush",
+      }),
+    });
+
+    let data;
     try {
-      const res = await fetch("/api/user/referral", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          address,
-          refCodeUsed: inputCode || "Raven-rush",
-        }),
-      });
-      const data = await res.json();
-      if (data?.user) {
-        setUserRef(data.user);
-        setSubmitted(true);
-      } else {
-        setError("Invalid referral code or already used.");
-      }
+      data = await res.json();
     } catch (err) {
-      console.error("Submit error:", err);
-      setError("Referral code submission failed.");
+      setError("Failed to parse server response.");
+      return;
     }
-  };
 
-  const copyCode = () => {
-    navigator.clipboard.writeText(userRef?.refCode || "");
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
+    if (res.ok && data?.user) {
+      setUserRef(data.user);
+      setSubmitted(true);
+      setError(null); // Clear previous error
+    } else if (data?.error) {
+      setError(data.error);
+    } else {
+      setError("Invalid referral code or already used.");
+    }
+  } catch (err) {
+    console.error("Submit error:", err);
+    setError("Referral code submission failed.");
+  }
+};
+
 
   if (!isConnected || !address) {
     return (

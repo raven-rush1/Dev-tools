@@ -46,25 +46,38 @@ const copyCode = () => {
       }
       return res.json();
     })
-    .then(setLeaderboard)
+    .then((data) => {
+      const leaderboardArr = Object.entries(data)
+        .map(([address, info]) => ({
+          address,
+          invites: Object.values(data).filter(
+            (entry) => entry.referredBy === info.referralCode
+          ).length,
+        }))
+        .sort((a, b) => b.invites - a.invites)
+        .map((user, index) => ({ ...user, rank: index + 1 }));
+
+      setLeaderboard(leaderboardArr);
+    })
     .catch((err) => {
       console.error("Referral API error:", err);
       setError("Unable to load referral leaderboard");
     });
 
-  // Get users own referral info
+  // Fetch user referral info remains unchanged
   fetch(`/api/user/referral?address=${address}`)
     .then((res) => res.json())
     .then((data) => {
       if (data?.refCode) {
         setUserRef(data);
-        setSubmitted(true); // 👈 Make sure the form does not reappear
+        setSubmitted(true);
       }
     })
     .catch((err) => {
       console.error("User referral fetch failed:", err);
     });
 }, [address]);
+
 
  // Handle submission
  const submitReferral = async () => {
@@ -77,10 +90,9 @@ const copyCode = () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        address,
-        refCodeUsed: inputCode || "Raven-rush",
-      }),
-    });
+  userAddress: address,
+  referralCode: inputCode || "Raven-rush",
+});
 
     console.log("Raw response:", res);
 

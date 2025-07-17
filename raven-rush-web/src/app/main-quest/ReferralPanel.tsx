@@ -47,18 +47,19 @@ const copyCode = () => {
       return res.json();
     })
     .then((data) => {
-      const leaderboardArr = Object.entries(data)
-        .map(([address, info]) => ({
-          address,
-          invites: Object.values(data).filter(
-            (entry) => entry.referredBy === info.referralCode
-          ).length,
-        }))
-        .sort((a, b) => b.invites - a.invites)
-        .map((user, index) => ({ ...user, rank: index + 1 }));
+  const leaderboardArr = Object.entries(data)
+    .map(([address, info]) => ({
+      address,
+      invites: Object.values(data).filter(
+        (entry: { referredBy?: string }) => entry.referredBy === info.referralCode
+      ).length,
+    }))
+    .sort((a, b) => b.invites - a.invites)
+    .map((user, index) => ({ ...user, rank: index + 1 }));
 
-      setLeaderboard(leaderboardArr);
-    })
+  setLeaderboard(leaderboardArr);
+})
+
     .catch((err) => {
       console.error("Referral API error:", err);
       setError("Unable to load referral leaderboard");

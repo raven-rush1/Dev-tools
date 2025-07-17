@@ -1,7 +1,5 @@
 // /api/user/referral/route.ts
 
-"use client";
-
 import fs from "fs";
 import path from "path";
 import { NextResponse } from "next/server";

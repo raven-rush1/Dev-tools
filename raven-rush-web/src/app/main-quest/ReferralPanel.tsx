@@ -90,9 +90,10 @@ const copyCode = () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-  userAddress: address,
-  referralCode: inputCode || "Raven-rush",
-});
+        userAddress: address,
+        referralCode: inputCode || "Raven-rush",
+      }),
+    });
 
     console.log("Raw response:", res);
 
@@ -123,6 +124,7 @@ const copyCode = () => {
     setError("Referral code submission failed.");
   }
 };
+
 
 
   if (!isConnected || !address) {

@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 // ❌ removed: import { motion } from "framer-motion";
 // Types
-type RefData = {
-  address: string;
-  invites: number;
-  rank: number;
+type ReferralRecord = {
+  referralCode: string;
+  referredBy: string | null;
+  timestamp: number;
 };
 
 type UserRefInfo = {
@@ -33,7 +33,7 @@ const copyCode = () => {
 
   const [error, setError] = useState<string | null>(null);
 
- useEffect(() => {
+useEffect(() => {
   if (!address) return;
 
   // Get leaderboard
@@ -47,25 +47,26 @@ const copyCode = () => {
       return res.json();
     })
     .then((data) => {
-  const leaderboardArr = Object.entries(data)
-    .map(([address, info]) => ({
-      address,
-      invites: Object.values(data).filter(
-        (entry: { referredBy?: string }) => entry.referredBy === info.referralCode
-      ).length,
-    }))
-    .sort((a, b) => b.invites - a.invites)
-    .map((user, index) => ({ ...user, rank: index + 1 }));
+      const typedData = data as Record<string, ReferralRecord>;
 
-  setLeaderboard(leaderboardArr);
-})
+      const leaderboardArr = Object.entries(typedData)
+        .map(([address, info]) => ({
+          address,
+          invites: Object.values(typedData).filter(
+            (entry) => entry.referredBy === info.referralCode
+          ).length,
+        }))
+        .sort((a, b) => b.invites - a.invites)
+        .map((user, index) => ({ ...user, rank: index + 1 }));
 
+      setLeaderboard(leaderboardArr);
+    })
     .catch((err) => {
       console.error("Referral API error:", err);
       setError("Unable to load referral leaderboard");
     });
 
-  // Fetch user referral info remains unchanged
+  // Get user's own info (no change here)
   fetch(`/api/user/referral?address=${address}`)
     .then((res) => res.json())
     .then((data) => {

@@ -23,12 +23,13 @@ export default function ReferralPanel() {
   const [submitted, setSubmitted] = useState(false);
   const [leaderboard, setLeaderboard] = useState<RefData[]>([]);
   const [copied, setCopied] = useState(false);
-const handleCopy = () => {
-  navigator.clipboard.writeText(generatedCode);
-  setCopied(true); // ✅ use it here
-  setTimeout(() => setCopied(false), 2000);
-}; {copied && <span className="text-green-400 text-sm">Copied!</span>}
-
+const copyCode = () => {
+  if (userRef?.refCode) {
+    navigator.clipboard.writeText(userRef.refCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+};
 
   const [error, setError] = useState<string | null>(null);
 
@@ -153,19 +154,19 @@ const handleCopy = () => {
             <span className="font-bold text-white">{userRef?.referrer}</span>
           </p>
           <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={userRef?.refCode || ""}
-              readOnly
-              className="flex-1 px-4 py-2 rounded bg-[#120422] border border-purple-800 text-white"
-            />
-            <button
-              onClick={copyCode}
-              className="px-3 py-1 text-sm bg-yellow-400 hover:bg-yellow-500 text-black rounded"
-            >
-              {copied ? "Copied!" : "Copy"}
-            </button>
-          </div>
+  <input
+    type="text"
+    value={userRef?.refCode || ""}
+    readOnly
+    className="flex-1 px-4 py-2 rounded bg-[#120422] border border-purple-800 text-white"
+  />
+  <button
+    onClick={copyCode}
+    className="px-3 py-1 text-sm bg-yellow-400 hover:bg-yellow-500 text-black rounded"
+  >
+    {copied ? "Copied!" : "Copy"}
+  </button>
+</div>
           <p className="text-gray-400 text-xs">
             Share your referral code. You will earn 1 invite point per user.
           </p>
